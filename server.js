@@ -20,10 +20,11 @@ app.use((req, res, next) => {
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const sheetsAuth = new google.auth.GoogleAuth({
-  keyFile: "./asistencia-prueba.json",
-  scopes: SCOPES,
+  credentials: JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS),
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 const sheets = google.sheets({ version: "v4", auth: sheetsAuth });
+
 
 app.post("/api/attendance", async (req, res) => {
   const { email } = req.body;
