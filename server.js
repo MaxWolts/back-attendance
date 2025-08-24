@@ -19,10 +19,17 @@ app.use((req, res, next) => {
   });
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
+
 const sheetsAuth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS),
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  credentials: {
+    type: "service_account",
+    project_id: process.env.GOOGLE_PROJECT_ID,
+    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+  },
+  scopes: SCOPES,
 });
+
 const sheets = google.sheets({ version: "v4", auth: sheetsAuth });
 
 
@@ -33,7 +40,7 @@ app.post("/api/attendance", async (req, res) => {
   try {
     const date = new Date().toISOString();
     await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.SHEET_ID, // tu Sheet ID
+      spreadsheetId: process.env.SHEET_ID,
       range: "Hoja 1!A1:B",
       valueInputOption: "USER_ENTERED",
       requestBody: {
